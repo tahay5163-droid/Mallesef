@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hoş geldin</title>
+<style>
+  :root { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: inherit; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  body {
+    font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    color: #fff;
+    background: linear-gradient(135deg, #3a0ca3, #7209b7, #f72585, #4361ee);
+    background-size: 400% 400%;
+    animation: bg 14s ease infinite;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none; -webkit-user-select: none;
+  }
+  body.love { background: linear-gradient(135deg, #ff0a54, #ff477e, #ff7096, #ffb3c6); background-size: 400% 400%; }
+  body.dark { background: radial-gradient(circle at 50% 40%, #4a0010, #0a0000 72%); animation: none; }
+  @keyframes bg { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+  /* yüzen renkli lekeler */
+  .blob { position: fixed; width: 55vmax; height: 55vmax; border-radius: 50%; filter: blur(70px); opacity: .35; z-index: 0; pointer-events: none; animation: drift 18s ease-in-out infinite alternate; }
+  .b1 { background: #00f5d4; left: -20vmax; top: -15vmax; }
+  .b2 { background: #fee440; right: -25vmax; bottom: -20vmax; animation-duration: 22s; }
+  .b3 { background: #ff006e; left: 30vw; top: 40vh; width: 35vmax; height: 35vmax; animation-duration: 26s; }
+  body.dark .blob { opacity: .08; }
+  @keyframes drift { to { transform: translate(12vw, 10vh) scale(1.2); } }
+
+  #fx { position: fixed; inset: 0; z-index: 3; pointer-events: none; }
+  #flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 4; }
+  #flash.go { animation: fl .7s ease-out; }
+  @keyframes fl { 0% { opacity: .95; } 100% { opacity: 0; } }
+
+  .stage {
+    position: fixed; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px 24px 14vh; text-align: center; gap: 22px;
+  }
+  .stage.jolt { animation: jolt .35s ease; }
+  @keyframes jolt { 0%,100%{transform:none} 25%{transform:translate(-8px,4px) rotate(-.6deg)} 50%{transform:translate(8px,-4px) rotate(.6deg)} 75%{transform:translate(-4px,2px)} }
+
+  #title {
+    margin: 0; font-size: clamp(3rem, 15vw, 9.5rem); font-weight: 900;
+    line-height: 1.05; letter-spacing: -0.02em; max-width: 14ch;
+    text-shadow: 0 6px 30px rgba(0,0,0,.35);
+  }
+  #title.long { font-size: clamp(1.9rem, 8vw, 4.4rem); max-width: 18ch; }
+  .w { display: inline-block; white-space: nowrap; margin-right: .26em; }
+  .l { display: inline-block; animation: drop .65s cubic-bezier(.2,1.5,.4,1) both; animation-delay: calc(var(--i) * 35ms); }
+  #title.idle .l { animation: drop .65s cubic-bezier(.2,1.5,.4,1) both, wave 2.2s ease-in-out infinite; animation-delay: calc(var(--i) * 35ms), calc(var(--i) * 110ms + 1s); }
+  #title.out .l { animation: dropout .35s ease forwards; animation-delay: calc(var(--i) * 12ms); }
+  @keyframes drop { from { opacity: 0; transform: translateY(-70px) rotate(-14deg) scale(.4); } to { opacity: 1; transform: none; } }
+  @keyframes dropout { to { opacity: 0; transform: translateY(50px) rotate(10deg) scale(.3); } }
+  @keyframes wave { 0%,100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+  #title.beat { animation: beat 1.1s ease-in-out infinite; }
+  @keyframes beat { 0%,100%{transform:scale(1)} 15%{transform:scale(1.07)} 30%{transform:scale(1)} 45%{transform:scale(1.07)} }
+  #title.doom { animation: shake .5s linear 3, glitch 2.4s .8s infinite; text-shadow: 0 0 30px #f00; color: #ffe5e5; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-16px) rotate(-2deg)} 40%{transform:translateX(16px) rotate(2deg)} 60%{transform:translateX(-10px)} 80%{transform:translateX(10px)} }
+  @keyframes glitch {
+    0%,88%,100% { transform: none; text-shadow: 0 0 30px #f00; }
+    90% { transform: translate(-6px,2px) skewX(8deg); text-shadow: 5px 0 #0ff, -5px 0 #f0f; }
+    94% { transform: translate(6px,-2px) skewX(-8deg); text-shadow: -5px 0 #0ff, 5px 0 #f0f; }
+    97% { transform: none; opacity: .6; }
+  }
+
+  #sub {
+    font-size: clamp(1.1rem, 4.5vw, 1.9rem); font-weight: 700; min-height: 1.4em;
+    opacity: 0; transform: translateY(14px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  #sub.show { opacity: .95; transform: none; }
+
+  #btn {
+    position: fixed; z-index: 5; left: 50%; top: 68%;
+    transform: translate(-50%, -50%) rotate(0deg);
+    transition: left .75s cubic-bezier(.68,-0.55,.27,1.55), top .75s cubic-bezier(.68,-0.55,.27,1.55),
+                transform .75s cubic-bezier(.68,-0.55,.27,1.55), opacity .5s ease;
+    padding: 18px 44px; font: inherit; font-size: clamp(1.2rem, 4.5vw, 1.8rem); font-weight: 800;
+    color: #3a0ca3; background: #fff; border: 0; border-radius: 999px; cursor: pointer;
+    box-shadow: 0 10px 0 rgba(0,0,0,.25), 0 18px 40px rgba(0,0,0,.3); white-space: nowrap;
+  }
+  #btn:active { box-shadow: 0 4px 0 rgba(0,0,0,.25); }
+  #btn.left  { left: 16px; top: calc(16px + env(safe-area-inset-top, 0px)); transform: translate(0,0) rotate(-10deg); }
+  #btn.right { left: calc(100% - 16px); top: calc(16px + env(safe-area-inset-top, 0px)); transform: translate(-100%,0) rotate(10deg); }
+  #btn.gone  { opacity: 0; pointer-events: none; }
+  #btn.idle  { animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { translate: 0 0; rotate: -2deg; } 50% { translate: 0 -8px; rotate: 2deg; } }
+  #btn.pop { animation: pop .5s ease; }
+  @keyframes pop { 0% { scale: 1; } 40% { scale: 1.3; } 100% { scale: 1; } }
+
+  #choices {
+    position: fixed; z-index: 5; left: 50%; top: 66%;
+    display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+    opacity: 0; transform: translate(-50%, 20px) scale(.85); pointer-events: none;
+    transition: opacity .6s ease, transform .6s cubic-bezier(.2,1.4,.4,1);
+  }
+  #choices.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+  #choices button {
+    font: inherit; font-size: clamp(1.2rem, 5vw, 1.8rem); font-weight: 800;
+    padding: 16px 42px; border: 0; border-radius: 999px; cursor: pointer;
+    box-shadow: 0 8px 0 rgba(0,0,0,.25); transition: transform .2s ease;
+  }
+  #choices button:active { transform: translateY(5px); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+  #yes { background: #ffd60a; color: #3a0ca3; }
+  #no  { background: #fff; color: #b00020; }
+
+  #again, #mute {
+    position: fixed; z-index: 6; border: 0; cursor: pointer; font: inherit; color: #fff;
+    background: rgba(0,0,0,.3); backdrop-filter: blur(6px);
+  }
+  #again {
+    left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+    padding: 12px 26px; border-radius: 999px; font-weight: 700; opacity: 0; pointer-events: none; transition: opacity .6s ease;
+  }
+  #again.show { opacity: 1; pointer-events: auto; }
+  #mute { left: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: 42px; height: 42px; border-radius: 50%; font-size: 1.1rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    body, .blob, #btn.idle, #title.idle .l, #title.beat { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <canvas id="fx"></canvas>
+  <div id="flash"></div>
+
+  <div class="stage" id="stage">
+    <h1 id="title" aria-live="polite"></h1>
+    <div id="sub"></div>
+  </div>
+
+  <button id="btn" class="gone">Tıkla</button>
+
+  <div id="choices">
+    <button id="yes">Evet</button>
+    <button id="no">Hayır</button>
+  </div>
+
+  <button id="again">Baştan oyna ↻</button>
+  <button id="mute" aria-label="Ses aç/kapat">🔊</button>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const title = $('title'), sub = $('sub'), btn = $('btn'), choices = $('choices'),
+        stage = $('stage'), again = $('again'), body = document.body;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let step = 0;
+
+  /* ---------- ses ---------- */
+  let ac, muted = false;
+  function tone(f, d = .15, type = 'sine', v = .14, delay = 0) {
+    if (muted) return;
+    try {
+      ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+      const t = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = f;
+      g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + d);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + d);
+    } catch (e) {}
+  }
+  $('mute').onclick = () => { muted = !muted; $('mute').textContent = muted ? '🔇' : '🔊'; };
+
+  /* ---------- parçacıklar (konfeti, kalp, kuru kafa) ---------- */
+  const cv = $('fx'), cx = cv.getContext('2d'), P = [];
+  let W, H;
+  function size() {
+    const d = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight; cv.width = W * d; cv.height = H * d; cx.setTransform(d, 0, 0, d, 0, 0);
+  }
+  addEventListener('resize', size); size();
+  const rnd = Math.random;
+  function spawn(e, x, y, vx, vy, g, s, life, a = 1) { P.push({ e, x, y, vx, vy, g, s, r: rnd() * 6, vr: (rnd() - .5) * .2, life, a }); }
+  function burst(list, n, x, y, power = 10) {
+    for (let i = 0; i < n; i++) {
+      const ang = rnd() * Math.PI * 2, p = 2 + rnd() * power;
+      spawn(list[i % list.length], x, y, Math.cos(ang) * p, Math.sin(ang) * p - 4, .22, 18 + rnd() * 22, 90 + rnd() * 60);
+    }
+  }
+  function rain(list, n, dur) {
+    for (let i = 0; i < n; i++) setTimeout(() => spawn(list[i % list.length], rnd() * W, -30, (rnd() - .5) * 2, 2 + rnd() * 3, .05, 22 + rnd() * 28, 500), i * dur / n);
+  }
+  function rise(list, n, dur) {
+    for (let i = 0; i < n; i++) setTimeout(() => spawn(list[i % list.length], rnd() * W, H + 30, (rnd() - .5) * 1.5, -(3 + rnd() * 4), 0, 22 + rnd() * 30, 500), i * dur / n);
+  }
+  (function loop() {
+    cx.clearRect(0, 0, W, H);
+    for (let i = P.length - 1; i >= 0; i--) {
+      const p = P[i];
+      p.vy += p.g; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+      if (p.life <= 0 || p.y > H + 60 || p.y < -80) { P.splice(i, 1); continue; }
+      cx.globalAlpha = Math.min(1, p.life / 30) * p.a;
+      cx.font = p.s + 'px serif';
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillText(p.e, -p.s / 2, p.s / 2); cx.restore();
+    }
+    requestAnimationFrame(loop);
+  })();
+  if (!reduce) setInterval(() => {
+    if (document.hidden || body.classList.contains('dark') || P.length > 25) return;
+    spawn('✨', rnd() * W, H + 20, (rnd() - .5) * .6, -(.6 + rnd() * .8), 0, 14 + rnd() * 14, 900, .5);
+  }, 800);
+
+  /* ---------- yardımcılar ---------- */
+  function setTitle(text, long, idle) {
+    return new Promise(res => {
+      const build = () => {
+        title.innerHTML = ''; title.setAttribute('aria-label', text);
+        let i = 0;
+        text.split(' ').forEach(word => {
+          const w = document.createElement('span'); w.className = 'w';
+          [...word].forEach(ch => {
+            const l = document.createElement('span'); l.className = 'l';
+            l.textContent = ch; l.style.setProperty('--i', i++); w.appendChild(l);
+          });
+          title.appendChild(w);
+        });
+        title.classList.toggle('long', !!long); title.classList.toggle('idle', !!idle);
+        title.classList.remove('out'); res();
+      };
+      if (title.children.length) { title.classList.remove('idle'); title.classList.add('out'); setTimeout(build, 450); }
+      else build();
+    });
+  }
+  function setBtn(text) {
+    btn.textContent = text; btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+  }
+  function showSub(t) { sub.textContent = t; sub.classList.add('show'); }
+  function hideSub() { sub.classList.remove('show'); }
+  function jolt() { stage.classList.remove('jolt'); void stage.offsetWidth; stage.classList.add('jolt'); }
+  function flash() { const f = $('flash'); f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); }
+
+  /* ---------- akış ---------- */
+  btn.addEventListener('click', () => {
+    step++; jolt(); btn.classList.remove('idle');
+    if (step === 1) {
+      btn.classList.add('left'); tone(700, .1, 'square', .07); tone(1000, .1, 'square', .07, .08);
+      showSub('Hoppala, kaçtı 🏃💨');
+    } else if (step === 2) {
+      btn.classList.replace('left', 'right'); tone(1000, .1, 'square', .07); tone(600, .12, 'square', .07, .08);
+      setBtn('Emin misin?'); showSub('Yine kaçtı 😂');
+    } else if (step === 3) {
+      setBtn('Bir daha soruyorum'); tone(330, .2, 'triangle', .15); hideSub();
+    } else if (step === 4) {
+      setTitle('İyi geldin 😎'); setBtn('Bir daha tıkla');
+      burst(['🎉', '✨', '⭐', '🎊'], 36, W / 2, H / 2);
+      [523, 659, 784].forEach((f, i) => tone(f, .18, 'triangle', .14, i * .09));
+      showSub('Tebrikler, buraya kadar geldin 👏');
+    } else if (step === 5) {
+      btn.classList.add('gone'); hideSub(); tone(220, .3, 'sine', .15);
+      setTitle('Buraya kadar geldiysen vardır bir şey...', true);
+      setTimeout(() => { choices.classList.add('show'); tone(660, .15, 'sine', .12); }, 2400);
+    }
+  });
+
+  function showAgain() { again.classList.add('show'); }
+
+  $('yes').addEventListener('click', () => {
+    choices.classList.remove('show'); hideSub();
+    body.classList.add('love'); jolt();
+    setTitle('Biliyordum, ben de seni seviyorum 💖', true).then(() => title.classList.add('beat'));
+    [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .35, 'triangle', .14, i * .12));
+    burst(['💖', '💕', '💘', '💗', '🎉'], 50, W / 2, H * .6, 13);
+    rise(['💖', '💕', '💘', '💗', '🌹'], 70, 5500);
+    setTimeout(showAgain, 6000);
+  });
+
+  $('no').addEventListener('click', () => {
+    choices.classList.remove('show'); hideSub();
+    flash(); jolt();
+    if (navigator.vibrate) navigator.vibrate([200, 80, 200, 80, 400]);
+    body.classList.add('dark');
+    setTitle('Allahaaaa emanet 💀', true).then(() => title.classList.add('doom'));
+    [300, 240, 180, 110].forEach((f, i) => tone(f, .35, 'sawtooth', .12, i * .22));
+    rain(['💀', '☠️', '👻', '🕯️'], 50, 4000);
+    setTimeout(showAgain, 6000);
+  });
+
+  again.addEventListener('click', () => {
+    again.classList.remove('show'); choices.classList.remove('show'); hideSub();
+    body.classList.remove('love', 'dark'); title.classList.remove('beat', 'doom');
+    btn.classList.remove('left', 'right'); step = 0;
+    setBtn('Tıkla'); btn.classList.remove('pop');
+    setTitle('Hoş geldin', false, true).then(() => {
+      btn.classList.remove('gone'); btn.classList.add('idle');
+    });
+  });
+
+  /* başlangıç */
+  setTitle('Hoş geldin', false, true).then(() => setTimeout(() => {
+    btn.classList.remove('gone'); btn.classList.add('idle');
+  }, 900));
+</script>
+</body>
+</html>
